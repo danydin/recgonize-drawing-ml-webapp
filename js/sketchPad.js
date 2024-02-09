@@ -53,7 +53,7 @@ class SketchPad{
                 this.#reDraw();
             }
         }
-        this.canvas.onmouseup=()=>{
+        document.onmouseup=()=>{
             this.isDrawing=false;
         }
 
@@ -70,7 +70,7 @@ class SketchPad{
             this.canvas.onmousemove(loc);
         }
         this.canvas.ontouchend=(evt)=>{
-            this.canvas.onmouseup();
+            document.onmouseup();
         }
 
         this.undoBtn.onclick=()=>{
