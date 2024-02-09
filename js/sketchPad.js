@@ -10,13 +10,24 @@ class SketchPad{
         `;
         container.appendChild(this.canvas);
 
+        const br = document.createElement("br");
+        container.appendChild(br);
+
+        // we use this.undoBtn below vs const in the br element above because const creates a local variable within the constructor's scope only, while this. make the property accessible throughout the class. The choice between them depends on whether you need the button element to be accessible only within the constructor or throughout the entire class.
+        this.undoBtn = document.createElement("button");
+        this.undoBtn.innerHTML = "UNDO";
+        container.appendChild(this.undoBtn);
+
         this.ctx = this.canvas.getContext("2d");
 
         this.paths=[];
 
         this.isDrawing = false; 
 
-        // detect mouse actions in a private method - can't be called from outside this class
+        // call it to disable the undo button on refresh
+        this.#reDraw();
+
+        // a private method - can't be called from outside this class
         this.#addEventListener();
     }
 
@@ -32,15 +43,18 @@ class SketchPad{
         this.canvas.onmousemove=(evt)=>{
             if(this.isDrawing){
                 const mouse = this.#getMouse(evt);
+                // access the last position in the paths array
                 const lastPath = this.paths[this.paths.length-1];
+                // extends the path with the new position as the user moves the mouse
                 lastPath.push(mouse);
+                // redrawing the entire canvas with the updated paths
                 this.#reDraw();
-                // console.log(this.paths.length)
             }
         }
         this.canvas.onmouseup=()=>{
             this.isDrawing=false;
         }
+
         // event listeners for touch screens / mobile 
         this.canvas.ontouchstart=(evt)=>{
             // console.log(evt);
@@ -49,14 +63,17 @@ class SketchPad{
             this.canvas.onmousedown(loc);
         }
         this.canvas.ontouchmove=(evt)=>{
-            // console.log(evt);
             const loc = evt.touches[0]; 
             console.log(loc);
             this.canvas.onmousemove(loc);
         }
         this.canvas.ontouchend=(evt)=>{
-            // console.log(evt);
             this.canvas.onmouseup();
+        }
+
+        this.undoBtn.onclick=()=>{
+            this.paths.pop();
+            this.#reDraw();
         }
     }
 
@@ -73,5 +90,10 @@ class SketchPad{
         this.ctx.clearRect(0,0,
             this.canvas.width,this.canvas.height);
             draw.paths(this.ctx,this.paths);
+            if(this.paths.length>0){
+                this.undoBtn.disabled=false;
+            } else {
+                this.undoBtn.disabled=true; 
+            }
     }
 }
