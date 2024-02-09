@@ -20,15 +20,17 @@ class SketchPad{
 
         this.ctx = this.canvas.getContext("2d");
 
-        this.paths=[];
-
-        this.isDrawing = false; 
-
-        // call it to disable the undo button on refresh
-        this.#reDraw();
+        this.reset();
 
         // a private method - can't be called from outside this class
         this.#addEventListener();
+    }
+
+    reset(){
+        this.paths=[];
+        this.isDrawing = false; 
+        // call it to disable the undo button on page refresh
+        this.#reDraw();
     }
 
     #addEventListener(){
